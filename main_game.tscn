@@ -1,0 +1,91 @@
+[gd_scene format=3 uid="uid://dofxxn3hgy4de"]
+
+[ext_resource type="Script" uid="uid://d0ss5n3vnti2r" path="res://main_game.gd" id="1_1oj5k"]
+
+[node name="MainGame" type="Control" unique_id=1336210394]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1oj5k")
+
+[node name="CombatZone" type="HBoxContainer" parent="." unique_id=1066518855]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -337.5
+offset_top = -51.5
+offset_right = 337.5
+offset_bottom = 51.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 200
+alignment = 1
+
+[node name="PlayerSide" type="VBoxContainer" parent="CombatZone" unique_id=1520496679]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+alignment = 1
+
+[node name="CharacterName" type="Label" parent="CombatZone/PlayerSide" unique_id=1480323379]
+layout_mode = 2
+text = "WARRIOR"
+
+[node name="CharacterHP" type="Label" parent="CombatZone/PlayerSide" unique_id=1314516496]
+layout_mode = 2
+text = "HP: 25"
+
+[node name="CharacterMP" type="Label" parent="CombatZone/PlayerSide" unique_id=1667887255]
+layout_mode = 2
+text = "MP: 3"
+
+[node name="CenterSpace" type="VBoxContainer" parent="CombatZone" unique_id=1453429790]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+alignment = 1
+
+[node name="VSLabel" type="Label" parent="CombatZone/CenterSpace" unique_id=1270693565]
+layout_mode = 2
+text = "VS"
+
+[node name="RollButton" type="Button" parent="CombatZone/CenterSpace" unique_id=1153393832]
+layout_mode = 2
+text = "CLICK TO CLASH"
+
+[node name="MagicButton" type="Button" parent="CombatZone/CenterSpace" unique_id=834000245]
+layout_mode = 2
+text = "Spell: HEAVY STRIKE (1 MP)"
+
+[node name="ResultLabel" type="Label" parent="CombatZone/CenterSpace" unique_id=694768367]
+layout_mode = 2
+text = "Prepare for Battle...
+"
+
+[node name="RestartButton" type="Button" parent="CombatZone/CenterSpace" unique_id=960364846]
+layout_mode = 2
+text = "Try Again"
+
+[node name="EnemySide" type="VBoxContainer" parent="CombatZone" unique_id=975464505]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+alignment = 1
+
+[node name="EnemyName" type="Label" parent="CombatZone/EnemySide" unique_id=1083808467]
+layout_mode = 2
+text = "RAT"
+
+[node name="EnemyHP" type="Label" parent="CombatZone/EnemySide" unique_id=2132305170]
+layout_mode = 2
+text = "HP: 10"
+
+[connection signal="pressed" from="CombatZone/CenterSpace/RollButton" to="." method="_on_roll_button_pressed"]
+[connection signal="pressed" from="CombatZone/CenterSpace/MagicButton" to="." method="_on_magic_button_pressed"]
+[connection signal="pressed" from="CombatZone/CenterSpace/RestartButton" to="." method="_on_restart_button_pressed"]

@@ -36,14 +36,30 @@ alignment = 1
 [node name="CharacterName" type="Label" parent="CombatZone/PlayerSide" unique_id=1480323379]
 layout_mode = 2
 text = "WARRIOR"
+horizontal_alignment = 1
 
 [node name="CharacterHP" type="Label" parent="CombatZone/PlayerSide" unique_id=1314516496]
 layout_mode = 2
 text = "HP: 25"
+horizontal_alignment = 1
 
 [node name="CharacterMP" type="Label" parent="CombatZone/PlayerSide" unique_id=1667887255]
 layout_mode = 2
 text = "MP: 3"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="CombatZone/PlayerSide" unique_id=1547659453]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+color = Color(0.50980395, 1, 0, 1)
+
+[node name="Spells" type="Label" parent="CombatZone/PlayerSide" unique_id=1804511581]
+layout_mode = 2
+text = "
+MAGIC BURST
+Deal Direct 8 DMG
+(cannot be defended)"
+horizontal_alignment = 1
 
 [node name="CenterSpace" type="VBoxContainer" parent="CombatZone" unique_id=1453429790]
 layout_mode = 2
@@ -54,6 +70,7 @@ alignment = 1
 [node name="VSLabel" type="Label" parent="CombatZone/CenterSpace" unique_id=1270693565]
 layout_mode = 2
 text = "VS"
+horizontal_alignment = 1
 
 [node name="RollButton" type="Button" parent="CombatZone/CenterSpace" unique_id=1153393832]
 layout_mode = 2
@@ -63,10 +80,16 @@ text = "CLICK TO CLASH"
 layout_mode = 2
 text = "Spell: HEAVY STRIKE (1 MP)"
 
+[node name="BattleLog" type="Label" parent="CombatZone/CenterSpace" unique_id=1160120064]
+modulate = Color(1, 1, 0, 1)
+self_modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+horizontal_alignment = 1
+
 [node name="ResultLabel" type="Label" parent="CombatZone/CenterSpace" unique_id=694768367]
 layout_mode = 2
-text = "Prepare for Battle...
-"
+text = "Prepare for Battle..."
+horizontal_alignment = 1
 
 [node name="RestartButton" type="Button" parent="CombatZone/CenterSpace" unique_id=960364846]
 layout_mode = 2
@@ -81,10 +104,20 @@ alignment = 1
 [node name="EnemyName" type="Label" parent="CombatZone/EnemySide" unique_id=1083808467]
 layout_mode = 2
 text = "RAT"
+horizontal_alignment = 1
 
 [node name="EnemyHP" type="Label" parent="CombatZone/EnemySide" unique_id=2132305170]
 layout_mode = 2
 text = "HP: 10"
+horizontal_alignment = 1
+
+[node name="Empty" type="Label" parent="CombatZone/EnemySide" unique_id=1932837059]
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="CombatZone/EnemySide" unique_id=1261830941]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+color = Color(1, 0.039215688, 0, 1)
 
 [connection signal="pressed" from="CombatZone/CenterSpace/RollButton" to="." method="_on_roll_button_pressed"]
 [connection signal="pressed" from="CombatZone/CenterSpace/MagicButton" to="." method="_on_magic_button_pressed"]

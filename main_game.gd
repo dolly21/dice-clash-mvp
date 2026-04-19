@@ -3,81 +3,125 @@ extends Control
 # --- GAME STATS ---
 @export_group("Player Stats")
 @export var player_hp: int = 20
-@export var player_atk: int = 2
+@export var player_atk: int = 5
 @export var player_mp: int = 3
+var player_current_hp: int = 20
 
 @export_group("Enemy Stats")
 @export var enemy_name: String = "The Rat"
 @export var enemy_hp: int = 15
-@export var enemy_atk: int = 2
+@export var enemy_atk: int = 4
+var enemy_current_hp: int = 15
+
+# Turn Tracking
+var is_player_turn: bool = true
 
 func _ready():
+	player_current_hp = player_hp
+	enemy_current_hp = enemy_hp
 	update_ui()
 	$CombatZone/EnemySide/EnemyName.text = enemy_name
-	print("System: Dice Clash MVP Initialized.")
+	set_turn_ui("Player")
 
 func update_ui():
-	$CombatZone/PlayerSide/CharacterHP.text = "HP: " + str(player_hp)
+	# Added AP to the text display here
+	$CombatZone/PlayerSide/CharacterHP.text = "HP: " + str(player_current_hp) + " | AP: " + str(player_atk)
 	$CombatZone/PlayerSide/CharacterMP.text = "MP: " + str(player_mp)
-	$CombatZone/EnemySide/EnemyHP.text = "HP: " + str(enemy_hp)
+	
+	$CombatZone/EnemySide/EnemyHP.text = "HP: " + str(enemy_current_hp) + " | AP: " + str(enemy_atk)
+
+func set_turn_ui(turn_owner: String):
+	if turn_owner == "Player":
+		$CombatZone/CenterSpace/RollButton.text = "Your Turn: Attack!"
+		$CombatZone/CenterSpace/MagicButton.disabled = false
+	else:
+		$CombatZone/CenterSpace/RollButton.text = "Enemy Turn: Defend!"
+		$CombatZone/CenterSpace/MagicButton.disabled = true
 
 func _on_roll_button_pressed():
-	# 1. YOUR TURN TO ATTACK
-	var p_roll = randi_range(1, 10)
-	var hit_chance = 4 
-	
-	if p_roll >= hit_chance:
-		var damage = player_atk + randi_range(1, 3)
-		enemy_hp -= damage
-		$CombatZone/CenterSpace/ResultLabel.text = "YOU HIT! Dealt " + str(damage) + " dmg."
+	if is_player_turn:
+		player_attack_phase()
 	else:
-		$CombatZone/CenterSpace/ResultLabel.text = "YOU MISSED the Rat!"
+		enemy_attack_phase()
+
+func player_attack_phase():
+	var p_dice = randi_range(1, 10)
+	var e_dice = randi_range(1, 10)
 	
+	var math_header = "YOU ATTACK!\nRoll: [" + str(p_dice) + "] vs Rat: [" + str(e_dice) + "]"
+	var result_text = ""
+	
+	# Perfectly Fair Logic: Strict Greater Than (Tie = Nothing happens)
+	if p_dice > e_dice:
+		var diff = p_dice - e_dice
+		var total_dmg = diff + player_atk
+		enemy_current_hp -= total_dmg
+		result_text = "SUCCESS! Dealt " + str(total_dmg) + " damage."
+	else:
+		result_text = "DEFENDED! The Rat blocked your strike."
+	
+	$CombatZone/CenterSpace/ResultLabel.text = math_header + "\n" + result_text
 	update_ui()
 	
-	# 2. CHECK IF RAT IS DEAD
-	if enemy_hp <= 0:
-		handle_victory()
-		return
+	if not check_game_over():
+		is_player_turn = false
+		set_turn_ui("Enemy")
 
-	# 3. THE RAT'S TURN TO ATTACK
-	var e_roll = randi_range(1, 10)
-	var player_dodge_chance = 5
+func enemy_attack_phase():
+	var e_dice = randi_range(1, 10)
+	var p_dice = randi_range(1, 10)
 	
-	if e_roll >= player_dodge_chance:
-		var e_damage = enemy_atk
-		player_hp -= e_damage
-		$CombatZone/CenterSpace/ResultLabel.text += "\nRat bit you for " + str(e_damage) + " dmg!"
+	var math_header = "RAT ATTACKS!\nRat: [" + str(e_dice) + "] vs You: [" + str(p_dice) + "]"
+	var result_text = ""
+	
+	# Perfectly Fair Logic: Strict Greater Than (Tie = Nothing happens)
+	if e_dice > p_dice:
+		var diff = e_dice - p_dice
+		var total_dmg = diff + enemy_atk
+		player_current_hp -= total_dmg
+		result_text = "HIT! You took " + str(total_dmg) + " damage."
 	else:
-		$CombatZone/CenterSpace/ResultLabel.text += "\nRat MISSED you!"
-
+		result_text = "DEFENDED! You parried the Rat's claws."
+	
+	$CombatZone/CenterSpace/ResultLabel.text = math_header + "\n" + result_text
 	update_ui()
 	
-	# 4. CHECK IF YOU DIED
-	if player_hp <= 0:
-		$CombatZone/CenterSpace/ResultLabel.text = "YOU DIED..."
-		$CombatZone/CenterSpace/RollButton.disabled = true
-		$CombatZone/CenterSpace/MagicButton.disabled = true
-		$CombatZone/CenterSpace/RestartButton.visible = true
+	if not check_game_over():
+		is_player_turn = true
+		set_turn_ui("Player")
 
 func _on_magic_button_pressed():
-	if player_mp > 0:
+	if is_player_turn and player_mp > 0:
 		player_mp -= 1
-		enemy_hp -= 6
-		$CombatZone/CenterSpace/ResultLabel.text = "MAGIC! Dealt 6 dmg."
+		var magic_dmg = 8
+		enemy_current_hp -= magic_dmg
+		$CombatZone/CenterSpace/ResultLabel.text = "MAGIC BURST!\nDealt " + str(magic_dmg) + " pure damage."
 		update_ui()
 		
-		if enemy_hp <= 0:
-			handle_victory()
-	else:
-		$CombatZone/CenterSpace/ResultLabel.text = "OUT OF MP!"
+		if not check_game_over():
+			is_player_turn = false
+			set_turn_ui("Enemy")
 
-func _on_restart_button_pressed():
-	print("RESTART CLICKED!")
-	get_tree().reload_current_scene()
+func check_game_over() -> bool:
+	if enemy_current_hp <= 0:
+		handle_victory()
+		return true
+	elif player_current_hp <= 0:
+		handle_death()
+		return true
+	return false
 
 func handle_victory():
-	$CombatZone/CenterSpace/ResultLabel.text = "VICTORY! The Rat is defeated."
+	$CombatZone/CenterSpace/ResultLabel.text += "\n\nVICTORY! The Rat is defeated."
 	$CombatZone/CenterSpace/RollButton.disabled = true
 	$CombatZone/CenterSpace/MagicButton.disabled = true
 	$CombatZone/CenterSpace/RestartButton.visible = true
+
+func handle_death():
+	$CombatZone/CenterSpace/ResultLabel.text += "\n\nYOU DIED... The quest ends."
+	$CombatZone/CenterSpace/RollButton.disabled = true
+	$CombatZone/CenterSpace/MagicButton.disabled = true
+	$CombatZone/CenterSpace/RestartButton.visible = true
+
+func _on_restart_button_pressed():
+	get_tree().reload_current_scene()
